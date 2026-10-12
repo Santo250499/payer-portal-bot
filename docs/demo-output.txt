@@ -1,0 +1,32 @@
+$ PORTAL_FLAKY=1 python -m portal.app &   # every 3rd lookup returns HTTP 500 to show retries
+$ PORTAL_USER=demo_biller PORTAL_PASS=*** python -m bot.run_bot
+2026-10-12 23:03:17,570 INFO Loaded 6 claim ids from data/claims.csv
+2026-10-12 23:03:18,186 INFO Logged in to portal
+2026-10-12 23:03:18,348 INFO CLM-2001 -> Paid
+2026-10-12 23:03:18,488 INFO CLM-2002 -> Denied
+2026-10-12 23:03:18,621 WARNING CLM-2003 attempt 1 failed: portal returned HTTP 500 (screenshot screenshots/CLM-2003_attempt1.png)
+2026-10-12 23:03:19,260 INFO CLM-2003 -> Pending
+2026-10-12 23:03:19,402 INFO CLM-2004 -> In Review
+2026-10-12 23:03:19,519 WARNING CLM-2005 attempt 1 failed: portal returned HTTP 500 (screenshot screenshots/CLM-2005_attempt1.png)
+2026-10-12 23:03:20,171 INFO CLM-2005 -> Denied
+2026-10-12 23:03:20,294 INFO CLM-9999 -> NOT_FOUND
+2026-10-12 23:03:20,375 INFO Done: 6 claims written to output/results.csv and output/results.db
+
+$ cat output/results.csv
+claim_id,status,billed,paid,date,reason,attempts,checked_at
+CLM-2001,Paid,"$1,250.00",$980.00,2026-09-14,,1,2026-10-12T23:03:18
+CLM-2002,Denied,$310.50,$0.00,2026-09-20,CARC 16 - missing info,1,2026-10-12T23:03:18
+CLM-2003,Pending,$88.00,$0.00,2026-10-01,,2,2026-10-12T23:03:19
+CLM-2004,In Review,"$4,020.00",$0.00,2026-10-03,,1,2026-10-12T23:03:19
+CLM-2005,Denied,$725.00,$0.00,2026-10-05,CARC 197 - no auth,2,2026-10-12T23:03:20
+CLM-9999,NOT_FOUND,,,,,1,2026-10-12T23:03:20
+$ SQLite: select claim_id,status,attempts from claim_status
+('CLM-2001', 'Paid', 1)
+('CLM-2002', 'Denied', 1)
+('CLM-2003', 'Pending', 2)
+('CLM-2004', 'In Review', 1)
+('CLM-2005', 'Denied', 2)
+('CLM-9999', 'NOT_FOUND', 1)
+$ ls screenshots/
+CLM-2003_attempt1.png
+CLM-2005_attempt1.png

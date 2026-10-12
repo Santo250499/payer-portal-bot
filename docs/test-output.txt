@@ -1,0 +1,6 @@
+tests/test_bot.py::test_read_claim_ids PASSED                            [ 20%]
+tests/test_bot.py::test_portal_login_required PASSED                     [ 40%]
+tests/test_bot.py::test_end_to_end PASSED                                [ 60%]
+tests/test_bot.py::test_bad_credentials PASSED                           [ 80%]
+tests/test_bot.py::test_retry_and_screenshot_on_flaky_portal PASSED      [100%]
+============================== 5 passed in 5.91s ===============================
