@@ -1,0 +1,16 @@
+<!doctype html><html><head><title>Claim Status</title>
+<style>body{font-family:sans-serif;max-width:600px;margin:40px auto}td{padding:4px 12px}</style></head>
+<body><h2>Claim Status Lookup</h2><a href="/logout" id="logout">Log out</a>
+<form method="post"><input id="claim-id" name="claim_id" placeholder="Claim ID"><button id="search-btn">Search</button></form>
+{% if claim_id %}
+  {% if result %}
+  <table id="result">
+    <tr><td>Claim</td><td id="r-claim">{{ claim_id }}</td></tr>
+    <tr><td>Status</td><td id="r-status">{{ result.status }}</td></tr>
+    <tr><td>Billed</td><td id="r-amount">{{ result.amount }}</td></tr>
+    <tr><td>Paid</td><td id="r-paid">{{ result.paid }}</td></tr>
+    <tr><td>Date</td><td id="r-date">{{ result.date }}</td></tr>
+    <tr><td>Reason</td><td id="r-reason">{{ result.reason or "" }}</td></tr>
+  </table>
+  {% else %}<p id="not-found">No claim found for {{ claim_id }}</p>{% endif %}
+{% endif %}</body></html>

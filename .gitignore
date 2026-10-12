@@ -1,0 +1,6 @@
+__pycache__/
+output/
+screenshots/
+bot.log
+.venv/
+.pytest_cache/
