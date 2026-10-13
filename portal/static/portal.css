@@ -161,3 +161,6 @@ main .sub { color: var(--ink-soft); margin: 0 0 24px; }
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }
 }
+
+/* static preview only (GitHub Pages) */
+.demo-hint { margin: -12px 0 24px; padding: 10px 14px; border-radius: var(--radius-sm); background: var(--review-bg); color: var(--review); font-size: .9rem; }
