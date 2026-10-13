@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sign in · Mock Payer Portal</title>
+  <link rel="stylesheet" href="portal.css">
+</head>
+<body>
+<div class="login">
+  <section class="login-brand">
+    <div class="brand"><span class="brand-mark" aria-hidden="true">✓</span> Mock Payer Portal</div>
+    <div>
+      <h1>Know where every claim stands.</h1>
+      <p>Look up any claim by its ID to see its status, what was billed, what was paid and why a claim was denied.</p>
+      <div class="status-row" aria-hidden="true">
+        <span class="pill s-paid">Paid</span>
+        <span class="pill s-pending">Pending</span>
+        <span class="pill s-in-review">In Review</span>
+        <span class="pill s-denied">Denied</span>
+      </div>
+    </div>
+    <small>Demo only. All claims are synthetic.</small>
+  </section>
+
+  <section class="login-form-wrap">
+    <form method="post" class="login-form" novalidate>
+      <h2>Sign in</h2>
+      <p class="sub">Use your biller account to continue.</p><p class="demo-hint">Demo sign-in: <b>demo_biller</b> / <b>S3cure!pass</b>. This is a static preview; all claims are synthetic.</p>
+
+      
+      <div class="alert" id="error" role="alert">
+        <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7.5" fill="currentColor"/><rect x="7.2" y="3.5" width="1.6" height="5.5" fill="#fff"/><rect x="7.2" y="10.6" width="1.6" height="1.6" fill="#fff"/></svg>
+        <span>Invalid username or password. Check both fields and try again.</span>
+      </div>
+      
+
+      <label class="field">
+        <span>Username</span>
+        <input class="input" id="username" name="username" autocomplete="username" autofocus required>
+      </label>
+      <label class="field">
+        <span>Password</span>
+        <span class="pw-wrap">
+          <input class="input" id="password" name="password" type="password" autocomplete="current-password" required>
+          <button type="button" class="pw-toggle" aria-controls="password" aria-pressed="false">Show</button>
+        </span>
+      </label>
+      <button class="btn" id="login-btn" type="submit">Sign in</button>
+    </form>
+  </section>
+</div>
+<script>
+  const t = document.querySelector('.pw-toggle'), pw = document.getElementById('password');
+  t.addEventListener('click', () => {
+    const show = pw.type === 'password';
+    pw.type = show ? 'text' : 'password';
+    t.textContent = show ? 'Hide' : 'Show';
+    t.setAttribute('aria-pressed', show);
+  });
+  document.querySelector('form').addEventListener('submit', () => {
+    document.getElementById('login-btn').setAttribute('aria-busy', 'true');
+  });
+</script>
+<script>
+(() => {
+  const CLAIMS = ["CLM-2001", "CLM-2002", "CLM-2003", "CLM-2004", "CLM-2005"], USER = "demo_biller", PASS = "S3cure!pass";
+  const login = document.querySelector('.login-form');
+  if (login) login.addEventListener('submit', e => {
+    e.preventDefault();
+    const ok = document.getElementById('username').value === USER && document.getElementById('password').value === PASS;
+    location.href = ok ? 'claims.html' : 'login-error.html';
+  });
+  const search = document.querySelector('.search');
+  if (search) search.addEventListener('submit', e => {
+    e.preventDefault();
+    const id = document.getElementById('claim-id').value.trim().toUpperCase();
+    location.href = CLAIMS.includes(id) ? 'claim-' + id + '.html' : 'not-found.html?id=' + encodeURIComponent(id);
+  });
+  const nf = document.getElementById('not-found');
+  if (nf) {
+    const id = new URLSearchParams(location.search).get('id') || '';
+    nf.querySelector('h2').textContent = 'No claim found for ' + id;
+    document.getElementById('claim-id').value = id;
+  }
+})();
+</script>
+</body>
+</html>

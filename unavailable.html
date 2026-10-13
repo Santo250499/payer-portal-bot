@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Service unavailable · Mock Payer Portal</title>
+  <link rel="stylesheet" href="portal.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><span class="brand-mark" aria-hidden="true">✓</span> Mock Payer Portal</div>
+  <div class="user"><a href="index.html" id="logout">Log out</a></div>
+</header>
+<main>
+  <section class="empty" id="unavailable">
+    <h2>Claim lookup is temporarily unavailable</h2>
+    <p>The payer's system didn't respond. Wait a few seconds, then <a href="claims.html">search again</a>.</p>
+  </section>
+</main>
+<script>
+(() => {
+  const CLAIMS = ["CLM-2001", "CLM-2002", "CLM-2003", "CLM-2004", "CLM-2005"], USER = "demo_biller", PASS = "S3cure!pass";
+  const login = document.querySelector('.login-form');
+  if (login) login.addEventListener('submit', e => {
+    e.preventDefault();
+    const ok = document.getElementById('username').value === USER && document.getElementById('password').value === PASS;
+    location.href = ok ? 'claims.html' : 'login-error.html';
+  });
+  const search = document.querySelector('.search');
+  if (search) search.addEventListener('submit', e => {
+    e.preventDefault();
+    const id = document.getElementById('claim-id').value.trim().toUpperCase();
+    location.href = CLAIMS.includes(id) ? 'claim-' + id + '.html' : 'not-found.html?id=' + encodeURIComponent(id);
+  });
+  const nf = document.getElementById('not-found');
+  if (nf) {
+    const id = new URLSearchParams(location.search).get('id') || '';
+    nf.querySelector('h2').textContent = 'No claim found for ' + id;
+    document.getElementById('claim-id').value = id;
+  }
+})();
+</script>
+</body>
+</html>

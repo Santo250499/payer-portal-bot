@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Claim status · Mock Payer Portal</title>
+  <link rel="stylesheet" href="portal.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><span class="brand-mark" aria-hidden="true">✓</span> Mock Payer Portal</div>
+  <div class="user"><span>Signed in as demo_biller</span><a href="index.html" id="logout">Log out</a></div>
+</header>
+
+<main>
+  <h1>Claim status</h1>
+  <p class="sub">Enter a claim ID to see its status and payment details.</p>
+
+  <form method="post" class="search" role="search">
+    <label for="claim-id" class="visually-hidden" style="position:absolute;left:-9999px">Claim ID</label>
+    <input class="input" id="claim-id" name="claim_id" placeholder="e.g. CLM-2001" autocomplete="off"
+           value="CLM-0000"  required>
+    <button class="btn" id="search-btn" type="submit">Search</button>
+  </form>
+  <div class="samples">
+    Try a sample claim:
+    <button type="button" class="chip" data-id="CLM-2001">CLM-2001</button><button type="button" class="chip" data-id="CLM-2002">CLM-2002</button><button type="button" class="chip" data-id="CLM-2003">CLM-2003</button><button type="button" class="chip" data-id="CLM-2004">CLM-2004</button><button type="button" class="chip" data-id="CLM-2005">CLM-2005</button>
+  </div>
+
+  
+    
+    <section class="empty" id="not-found" aria-live="polite">
+      <h2>No claim found for CLM-0000</h2>
+      <p>Check the ID for typos. Claim IDs look like CLM-2001.</p>
+    </section>
+    
+  
+</main>
+<script>
+  const form = document.querySelector('.search'), input = document.getElementById('claim-id');
+  form.addEventListener('submit', () => {
+    input.value = input.value.trim().toUpperCase();
+    const b = document.getElementById('search-btn');
+    b.setAttribute('aria-busy', 'true'); b.textContent = 'Searching…';
+  });
+  document.querySelectorAll('.chip').forEach(c => c.addEventListener('click', () => {
+    input.value = c.dataset.id; form.requestSubmit();
+  }));
+</script>
+<script>
+(() => {
+  const CLAIMS = ["CLM-2001", "CLM-2002", "CLM-2003", "CLM-2004", "CLM-2005"], USER = "demo_biller", PASS = "S3cure!pass";
+  const login = document.querySelector('.login-form');
+  if (login) login.addEventListener('submit', e => {
+    e.preventDefault();
+    const ok = document.getElementById('username').value === USER && document.getElementById('password').value === PASS;
+    location.href = ok ? 'claims.html' : 'login-error.html';
+  });
+  const search = document.querySelector('.search');
+  if (search) search.addEventListener('submit', e => {
+    e.preventDefault();
+    const id = document.getElementById('claim-id').value.trim().toUpperCase();
+    location.href = CLAIMS.includes(id) ? 'claim-' + id + '.html' : 'not-found.html?id=' + encodeURIComponent(id);
+  });
+  const nf = document.getElementById('not-found');
+  if (nf) {
+    const id = new URLSearchParams(location.search).get('id') || '';
+    nf.querySelector('h2').textContent = 'No claim found for ' + id;
+    document.getElementById('claim-id').value = id;
+  }
+})();
+</script>
+</body>
+</html>
