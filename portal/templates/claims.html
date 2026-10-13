@@ -1,16 +1,85 @@
-<!doctype html><html><head><title>Claim Status</title>
-<style>body{font-family:sans-serif;max-width:600px;margin:40px auto}td{padding:4px 12px}</style></head>
-<body><h2>Claim Status Lookup</h2><a href="/logout" id="logout">Log out</a>
-<form method="post"><input id="claim-id" name="claim_id" placeholder="Claim ID"><button id="search-btn">Search</button></form>
-{% if claim_id %}
-  {% if result %}
-  <table id="result">
-    <tr><td>Claim</td><td id="r-claim">{{ claim_id }}</td></tr>
-    <tr><td>Status</td><td id="r-status">{{ result.status }}</td></tr>
-    <tr><td>Billed</td><td id="r-amount">{{ result.amount }}</td></tr>
-    <tr><td>Paid</td><td id="r-paid">{{ result.paid }}</td></tr>
-    <tr><td>Date</td><td id="r-date">{{ result.date }}</td></tr>
-    <tr><td>Reason</td><td id="r-reason">{{ result.reason or "" }}</td></tr>
-  </table>
-  {% else %}<p id="not-found">No claim found for {{ claim_id }}</p>{% endif %}
-{% endif %}</body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Claim status · Mock Payer Portal</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='portal.css') }}">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><span class="brand-mark" aria-hidden="true">✓</span> Mock Payer Portal</div>
+  <div class="user"><span>Signed in as {{ user }}</span><a href="/logout" id="logout">Log out</a></div>
+</header>
+
+<main>
+  <h1>Claim status</h1>
+  <p class="sub">Enter a claim ID to see its status and payment details.</p>
+
+  <form method="post" class="search" role="search">
+    <label for="claim-id" class="visually-hidden" style="position:absolute;left:-9999px">Claim ID</label>
+    <input class="input" id="claim-id" name="claim_id" placeholder="e.g. CLM-2001" autocomplete="off"
+           value="{{ claim_id or '' }}" {% if not claim_id %}autofocus{% endif %} required>
+    <button class="btn" id="search-btn" type="submit">Search</button>
+  </form>
+  <div class="samples">
+    Try a sample claim:
+    {% for s in samples %}<button type="button" class="chip" data-id="{{ s }}">{{ s }}</button>{% endfor %}
+  </div>
+
+  {% if claim_id %}
+    {% if result %}
+    {% set key = result.status|lower|replace(' ', '-') %}
+    {% set billed = result.amount|replace('$','')|replace(',','')|float %}
+    {% set paid = result.paid|replace('$','')|replace(',','')|float %}
+    {% set pct = ((paid / billed * 100) if billed else 0)|round|int %}
+    <section class="result" id="result" aria-live="polite">
+      <div class="result-head s-{{ key }}">
+        <div class="claim-id">Claim <span id="r-claim">{{ claim_id }}</span></div>
+        <div class="big-status" id="r-status">{{ result.status }}</div>
+        <p class="meaning">
+          {% if key == 'paid' %}The payer has processed this claim and sent payment.
+          {% elif key == 'denied' %}The payer won't pay this claim. Fix the reason below and resubmit.
+          {% elif key == 'pending' %}The payer has received this claim but hasn't processed it yet.
+          {% elif key == 'in-review' %}The payer is reviewing this claim and may ask for more records.
+          {% endif %}
+        </p>
+      </div>
+      <div class="result-body">
+        <dl class="money">
+          <div><dt>Billed</dt><dd class="num" id="r-amount">{{ result.amount }}</dd></div>
+          <div><dt>Paid</dt><dd class="num" id="r-paid">{{ result.paid }}</dd></div>
+        </dl>
+        <div class="bar" role="img" aria-label="{{ pct }}% of the billed amount was paid"><span style="width: {{ pct }}%"></span></div>
+        <p class="bar-label">{{ pct }}% of the billed amount was paid</p>
+
+        <dl class="details">
+          <dt>Status date</dt><dd class="num" id="r-date">{{ result.date }}</dd>
+        </dl>
+        <div class="reason-box{% if not result.reason %} is-empty{% endif %}">
+          <strong>Denial reason</strong>
+          <span id="r-reason">{{ result.reason or "" }}</span>
+        </div>
+      </div>
+    </section>
+    {% else %}
+    <section class="empty" id="not-found" aria-live="polite">
+      <h2>No claim found for {{ claim_id }}</h2>
+      <p>Check the ID for typos. Claim IDs look like CLM-2001.</p>
+    </section>
+    {% endif %}
+  {% endif %}
+</main>
+<script>
+  const form = document.querySelector('.search'), input = document.getElementById('claim-id');
+  form.addEventListener('submit', () => {
+    input.value = input.value.trim().toUpperCase();
+    const b = document.getElementById('search-btn');
+    b.setAttribute('aria-busy', 'true'); b.textContent = 'Searching…';
+  });
+  document.querySelectorAll('.chip').forEach(c => c.addEventListener('click', () => {
+    input.value = c.dataset.id; form.requestSubmit();
+  }));
+</script>
+</body>
+</html>

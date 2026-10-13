@@ -43,10 +43,11 @@ def claims():
     if request.method == "POST":
         LOOKUPS["n"] += 1
         if os.getenv("PORTAL_FLAKY") == "1" and LOOKUPS["n"] % 3 == 0:
-            return "Service temporarily unavailable", 500
+            return render_template("unavailable.html"), 500
         claim_id = request.form.get("claim_id", "").strip().upper()
         result = CLAIMS.get(claim_id)
-    return render_template("claims.html", claim_id=claim_id, result=result)
+    return render_template("claims.html", claim_id=claim_id, result=result,
+                           user=session["user"], samples=list(CLAIMS))
 
 
 @app.route("/logout")

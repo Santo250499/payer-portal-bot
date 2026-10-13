@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Service unavailable · Mock Payer Portal</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='portal.css') }}">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><span class="brand-mark" aria-hidden="true">✓</span> Mock Payer Portal</div>
+  <div class="user"><a href="/logout" id="logout">Log out</a></div>
+</header>
+<main>
+  <section class="empty" id="unavailable">
+    <h2>Claim lookup is temporarily unavailable</h2>
+    <p>The payer's system didn't respond. Wait a few seconds, then <a href="/claims">search again</a>.</p>
+  </section>
+</main>
+</body>
+</html>
